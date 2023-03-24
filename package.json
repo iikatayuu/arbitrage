@@ -2,6 +2,26 @@
   "name": "arbitrage",
   "version": "0.1.0",
   "private": true,
+  "description": "Automate buy/sell opportunities between crypto exchanges",
+  "keywords": [
+    "nodejs",
+    "express",
+    "react",
+    "crypto",
+    "arbitrage"
+  ],
+  "homepage": "https://github.com/eidoriantan/arbitrage#readme",
+  "bugs": "https://github.com/eidoriantan/arbitrage/issues",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Adriane Justine Tan",
+    "email": "eidoriantan@gmail.com",
+    "url": "https://eidoriantan.me"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eidoriantan/arbitrage.git"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
