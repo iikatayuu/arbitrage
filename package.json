@@ -10,7 +10,6 @@
     "crypto",
     "arbitrage"
   ],
-  "homepage": "https://github.com/eidoriantan/arbitrage#readme",
   "bugs": "https://github.com/eidoriantan/arbitrage/issues",
   "license": "UNLICENSED",
   "author": {
@@ -23,6 +22,7 @@
     "url": "git+https://github.com/eidoriantan/arbitrage.git"
   },
   "dependencies": {
+    "@binance/connector": "^2.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -30,6 +30,11 @@
     "@types/node": "^16.18.19",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
+    "axios": "^1.3.4",
+    "bignumber.js": "^9.1.1",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.0.3",
+    "node-cron": "^3.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -37,6 +42,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "server": "cross-env NODE_ENV=production node server/index.js",
+    "dev": "cross-env NODE_ENV=development node server/index.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
