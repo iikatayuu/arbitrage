@@ -1,14 +1,13 @@
 
 const Market = require('./market')
-const { getBalance, getFees } = require('./account')
-const { buy, sell, normalize } = require('./trade')
+const { getBalance, calculateFee } = require('./account')
+const { buy, sell } = require('./trade')
 
 module.exports = {
   name: 'binance',
   buy,
   sell,
-  normalize,
   getBalance,
-  getFees,
+  calculateFee,
   Market
 }

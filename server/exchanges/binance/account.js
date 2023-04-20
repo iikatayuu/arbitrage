@@ -18,8 +18,8 @@ async function getBalance (currency) {
   return free
 }
 
-async function getFees () {
-  return new BigNumber(0)
+async function calculateFee (currency) {
+  return new BigNumber(currency)
 }
 
-module.exports = { getBalance, getFees }
+module.exports = { getBalance, calculateFee }
