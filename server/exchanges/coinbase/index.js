@@ -1,6 +1,6 @@
 
 const Market = require('./market')
-const { getBalance, getFees } = require('./account')
+const { getBalance, calculateFee } = require('./account')
 const { buy, sell } = require('./trade')
 
 module.exports = {
@@ -8,6 +8,6 @@ module.exports = {
   buy,
   sell,
   getBalance,
-  getFees,
+  calculateFee,
   Market
 }
