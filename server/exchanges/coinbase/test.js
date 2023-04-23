@@ -37,10 +37,8 @@ async function start () {
 
   // BUY
   console.log('Buy test (USD -> BTC)...')
-  const usd = await coinbase.calculateFee(new BigNumber(usdBalance.decimalPlaces(2, BigNumber.ROUND_FLOOR)))
-  const btc = usd.dividedBy(market.bid).decimalPlaces(8, BigNumber.ROUND_FLOOR)
-  console.log('%s USD (%s USD per BTC) -> %s BTC', usd.toString(), market.bid.toString(), btc.toString())
-  await coinbase.buy('BTC-USD', market.bid.toNumber(), btc.toNumber())
+  const usd = await coinbase.calculateFee(usdBalance)
+  await coinbase.buy('BTC-USD', market.bid, usd, undefined, 8)
 
   // GET BALANCE
   usdBalance = await coinbase.getBalance('USD')
@@ -50,11 +48,8 @@ async function start () {
 
   // SELL
   console.log('Sell test (BTC -> USDT)...')
-  const sellUsdFull = btcBalance.multipliedBy(market.ask).decimalPlaces(2, BigNumber.ROUND_FLOOR)
-  const sellUsd = await coinbase.calculateFee(sellUsdFull)
-  const sellBtc = sellUsd.dividedBy(market.ask).decimalPlaces(8, BigNumber.ROUND_FLOOR)
-  console.log('%s USD (%s USD per BTC) -> %s BTC', sellUsd.toString(), market.ask.toString(), sellBtc.toString())
-  await coinbase.sell('BTC-USD', market.ask.toNumber(), sellBtc.toNumber())
+  const btc = await coinbase.calculateFee(btcBalance)
+  await coinbase.sell('BTC-USD', market.ask, btc, undefined, 2)
 
   usdBalance = await coinbase.getBalance('USD')
   btcBalance = await coinbase.getBalance('BTC')

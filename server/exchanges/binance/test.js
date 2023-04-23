@@ -40,7 +40,8 @@ async function start () {
 
   // BUY
   console.log('Buy test (USDT -> BTC)...')
-  await binance.buy('BTCUSDT', market.bid, usdtBalance, maxNotation, 8)
+  const usdt = await binance.calculateFee(usdtBalance)
+  await binance.buy('BTCUSDT', market.bid, usdt, maxNotation, 8)
 
   // GET BALANCE
   usdtBalance = await binance.getBalance('USDT')
@@ -50,7 +51,8 @@ async function start () {
 
   // SELL
   console.log('Sell test (BTC -> USDT)...')
-  await binance.sell('BTCUSDT', market.ask, btcBalance, maxNotationBtc, 8)
+  const btc = await binance.calculateFee(btcBalance)
+  await binance.sell('BTCUSDT', market.ask, btc, maxNotationBtc, 2)
 
   usdtBalance = await binance.getBalance('USDT')
   btcBalance = await binance.getBalance('BTC')

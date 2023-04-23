@@ -77,14 +77,14 @@ async function buy (symbol, price, quote, maxQuote, baseDp) {
   await Promise.all(orders)
 }
 
-async function sell (symbol, price, base, maxBase, baseDp) {
+async function sell (symbol, price, base, maxBase, quoteDp) {
   const sells = []
   const sellLoops = base.dividedBy(maxBase).decimalPlaces(0, BigNumber.ROUND_CEIL)
   let balance = base
   for (let i = 0; i < sellLoops; i++) {
     const step = balance.isGreaterThan(maxBase) ? maxBase : balance
     const stepRounded = await normalize('BTCUSDT', step)
-    const stepQuote = stepRounded.multipliedBy(price).decimalPlaces(baseDp, BigNumber.ROUND_FLOOR)
+    const stepQuote = stepRounded.multipliedBy(price).decimalPlaces(quoteDp, BigNumber.ROUND_FLOOR)
     console.log('Symbol (%s): %s -> %s', symbol, stepRounded.toString(), stepQuote.toString())
     const sell = client.newOrder(symbol, 'SELL', 'LIMIT', {
       price,
@@ -107,4 +107,12 @@ async function sell (symbol, price, base, maxBase, baseDp) {
   await Promise.all(orders)
 }
 
-module.exports = { buy, sell }
+function getMaxNotation (symbol) {
+  if (symbol === 'BTCUSDT') {
+    return new BigNumber(10000)
+  } else {
+    return null
+  }
+}
+
+module.exports = { buy, sell, getMaxNotation }
