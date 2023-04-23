@@ -78,7 +78,7 @@ async function sell (productId, price, base, maxBase, quoteDp) {
 }
 
 function getMaxNotation (productId) {
-  return null
+  return new BigNumber(0)
 }
 
 module.exports = { buy, sell, getMaxNotation }

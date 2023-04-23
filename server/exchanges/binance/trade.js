@@ -111,7 +111,7 @@ function getMaxNotation (symbol) {
   if (symbol === 'BTCUSDT') {
     return new BigNumber(10000)
   } else {
-    return null
+    return new BigNumber(0)
   }
 }
 
