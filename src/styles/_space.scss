@@ -1,0 +1,34 @@
+
+@use "sass:list";
+
+@import "./variables";
+
+@mixin generate($prefix, $property) {
+  @for $i from 1 through length($sizes) {
+    $size: list.nth($sizes, $i);
+
+    .#{$prefix}-#{$i - 1} {
+      #{$property}: $spacing * $size !important;
+    }
+  }
+}
+
+@include generate(m, margin);
+@include generate(mt, margin-top);
+@include generate(ml, margin-left);
+@include generate(mb, margin-bottom);
+@include generate(mr, margin-right);
+@include generate(my, margin-top);
+@include generate(my, margin-bottom);
+@include generate(mx, margin-left);
+@include generate(mx, margin-right);
+
+@include generate(p, padding);
+@include generate(pt, padding-top);
+@include generate(pl, padding-left);
+@include generate(pb, padding-bottom);
+@include generate(pr, padding-right);
+@include generate(py, padding-top);
+@include generate(py, padding-bottom);
+@include generate(px, padding-left);
+@include generate(px, padding-right);

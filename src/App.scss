@@ -1,0 +1,13 @@
+
+@import "./styles/default";
+@import "./styles/variables";
+@import "./styles/space";
+
+@import "./styles/alert";
+@import "./styles/button";
+@import "./styles/form";
+
+body {
+  background-color: $background-color;
+  color: $background-color-contrast;
+}

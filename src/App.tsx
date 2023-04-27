@@ -1,10 +1,19 @@
 
 import React from 'react';
-import './App.css';
+import { Routes, Route } from 'react-router-dom';
+
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import './App.scss';
 
 class App extends React.Component {
   render () {
-    return <h1>Arbitrage</h1>;
+    return (
+      <Routes>
+        <Route index element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    );
   }
 }
 

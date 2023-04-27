@@ -1,0 +1,11 @@
+
+@import "./variables";
+
+.alert {
+  padding: 0.375em 0.75em;
+  border-radius: 4px;
+}
+
+.alert-error {
+  border: 1px solid $border-error-color;
+}

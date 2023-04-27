@@ -1,0 +1,48 @@
+
+@use "sass:color";
+
+@import "./variables";
+
+.btn {
+  display: inline-block;
+  padding: 0.375em 0.75em;
+  line-height: 1.5;
+  background-color: transparent;
+  border-width: 0;
+  border-radius: 4px;
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+  }
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: $primary-color-contrast;
+
+  &:not(:disabled):hover, &:not(:disabled):focus {
+    background-color: color.scale($primary-color, $blackness: 20%);
+  }
+
+  &:disabled {
+    background-color: color.scale($primary-color, $lightness: 50%);
+  }
+}
+
+.btn-secondary {
+  background-color: $secondary-color;
+  color: $secondary-color-contrast;
+
+  &:not(:disabled):hover, &:not(:disabled):focus {
+    background-color: color.scale($secondary-color, $blackness: 20%);
+  }
+
+  &:disabled {
+    background-color: color.scale($secondary-color, $lightness: 20%);
+  }
+}
