@@ -2,6 +2,7 @@
 const BigNumber = require('bignumber.js')
 const coinbase = require('./exchanges/coinbase')
 const binance = require('./exchanges/binance')
+const database = require('./database/')
 const wait = require('./utils/wait')
 
 const ARBITRAGE_MIN_DIFF = parseFloat(process.env.ARBITRAGE_MIN_DIFF)
@@ -127,6 +128,24 @@ async function arbitrage () {
 
   if (isVerbose) console.log('Waiting for transactions...')
   await Promise.all(promises)
+
+  const data = JSON.stringify({
+    buy: {
+      name: buyEx.name,
+      ask: buyEx.ask.toNumber(),
+      bid: buyEx.bid.toNumber()
+    },
+    sell: {
+      name: sellEx.name,
+      ask: sellEx.ask.toNumber(),
+      bid: sellEx.bid.toNumber()
+    }
+  })
+
+  if (isVerbose) console.log('Saving to database...')
+  const sql = 'INSERT INTO trades (buy_usd, sell_btc, profit, exchanges) VALUES (?, ?, ?, ?)'
+  const values = [buyUsd.toNumber(), sellBtc.toNumber(), difference.toNumber(), data]
+  await database.query(sql, values)
 }
 
 module.exports = { start }
