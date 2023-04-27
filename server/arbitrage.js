@@ -110,7 +110,10 @@ async function arbitrage () {
     buyUsd.isLessThanOrEqualTo(2.5) ||
     sellUsd.isLessThanOrEqualTo(2.5) ||
     difference.isLessThan(ARBITRAGE_MIN_DIFF)
-  ) return
+  ) {
+    console.log('No balance or not enough profit')
+    return
+  }
 
   const promises = []
   const buyMaxNotation = buyEx.getMaxNotation(buyEx.symbol)
@@ -122,6 +125,7 @@ async function arbitrage () {
   console.log('Executing sell from %s', sellEx.name)
   promises.push(sellEx.sell(sellEx.symbol, sellEx.ask, sellBtc, sellMaxNotationBtc, 2))
 
+  if (isVerbose) console.log('Waiting for transactions...')
   await Promise.all(promises)
 }
 
