@@ -9,14 +9,23 @@ const ARBITRAGE_MIN_DIFF = parseFloat(process.env.ARBITRAGE_MIN_DIFF)
 const ARBITRAGE_INTERVAL = parseFloat(process.env.ARBITRAGE_INTERVAL)
 
 const isVerbose = process.env.VERBOSE !== ''
-const pair = []
+let pair = []
 
 function hasStopped () {
   for (let i = 0; i < pair.length; i++) {
     if (pair.stopped) return true
   }
 
-  return false
+  return !(pair.length > 0)
+}
+
+function stop () {
+  for (let i = 0; i < pair.length; i++) {
+    const market = pair[i]
+    market.stop()
+  }
+
+  pair = []
 }
 
 async function start () {
@@ -48,6 +57,7 @@ async function start () {
       symbol,
       quote,
       base,
+      market,
       buy: exchange.buy,
       sell: exchange.sell,
       getMaxNotation: exchange.getMaxNotation,
@@ -148,4 +158,4 @@ async function arbitrage () {
   await database.query(sql, values)
 }
 
-module.exports = { start }
+module.exports = { start, stop }
