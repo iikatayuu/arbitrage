@@ -97,7 +97,6 @@ async function start () {
 async function arbitrage () {
   let buyEx = null
   let sellEx = null
-  let diff = null
 
   const exa = pair[0]
   const exb = pair[1]
@@ -107,11 +106,9 @@ async function arbitrage () {
   if (diffA.isGreaterThan(diffB)) {
     buyEx = exb
     sellEx = exa
-    diff = diffA
   } else {
     buyEx = exa
     sellEx = exb
-    diff = diffB
   }
 
   if (isVerbose) console.log('Calculating balances and fees')
