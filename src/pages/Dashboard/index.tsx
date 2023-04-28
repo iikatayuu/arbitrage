@@ -12,6 +12,7 @@ import {
   Legend
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import axios from 'axios';
 
 import { MarketData } from '../../types';
 import { getTime } from '../../utils/date';
@@ -35,16 +36,22 @@ interface DashboardProps extends DashboardWrapProps {
 
 interface DashboardState {
   markets: MarketData[][];
+  coinbaseUsd: number;
+  coinbaseBtc: number;
+  binanceUsdt: number;
+  binanceBtc: number;
 }
 
 class Dashboard extends React.Component<DashboardProps, DashboardState> {
-  ws: WebSocket | null = null;
-
   constructor (props: DashboardProps) {
     super(props);
 
     this.state = {
-      markets: []
+      markets: [],
+      coinbaseUsd: 0,
+      coinbaseBtc: 0,
+      binanceUsdt: 0,
+      binanceBtc: 0
     };
 
     this.logout = this.logout.bind(this);
@@ -55,7 +62,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.props.navigate('/');
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     const backend = process.env.REACT_APP_BACKEND_API;
     const token = sessionStorage.getItem('token');
     if (typeof backend === 'undefined' || token === null) return;
@@ -71,7 +78,23 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       this.setState({ markets });
     })
 
-    this.ws = ws;
+    try {
+      const balancesRes = await axios.get(`${backend}/api/balances`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (balancesRes.data.success) {
+        const balances = balancesRes.data.balances;
+        this.setState({
+          coinbaseUsd: balances[0].usd,
+          coinbaseBtc: balances[0].btc,
+          binanceUsdt: balances[1].usdt,
+          binanceBtc: balances[1].btc
+        });
+      }
+    } catch (error) {
+      window.alert('Unable to fetch balances');
+    }
   }
 
   render () {
@@ -151,11 +174,19 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         <main>
           <div className="dashboard-prices">
             <div className="dashboard-price p-4">
-              <Line options={coinbaseOptions} data={coinbaseData} />
+              <Line options={coinbaseOptions} data={coinbaseData} className="mb-3" />
+
+              <h3>Coinbase</h3>
+              <div>USD Balance: { this.state.coinbaseUsd } $</div>
+              <div>BTC Balance: { this.state.coinbaseBtc } BTC</div>
             </div>
 
             <div className="dashboard-price p-4">
-              <Line options={binanceOptions} data={binanceData} />
+              <Line options={binanceOptions} data={binanceData} className="mb-3" />
+
+              <h3>Binance</h3>
+              <div>USDT Balance: { this.state.binanceUsdt } $</div>
+              <div>BTC Balance: { this.state.binanceBtc } BTC</div>
             </div>
           </div>
         </main>

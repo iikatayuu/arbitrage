@@ -13,3 +13,10 @@
   flex: 1;
   max-width: 600px;
 }
+
+@media (min-width: 0) and (max-width: 992px) {
+  .dashboard-prices {
+    flex-direction: column;
+    align-items: center;
+  }
+}
