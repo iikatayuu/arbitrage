@@ -17,6 +17,8 @@ const arbitrage = require('./arbitrage')
 require('./database')
 
 const api = require('./api')
+const ws = require('./ws')
+
 const app = express()
 const port = process.env.PORT || '3001'
 const publicPath = path.resolve(__dirname, 'build')
@@ -39,8 +41,10 @@ app.use((err, req, res, next) => {
   })
 })
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is listening on port: ${port}`)
 })
+
+server.on('upgrade', ws)
 
 arbitrage.start()

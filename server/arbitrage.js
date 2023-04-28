@@ -19,6 +19,10 @@ function hasStopped () {
   return !(pair.length > 0)
 }
 
+function getPair () {
+  return pair
+}
+
 function stop () {
   for (let i = 0; i < pair.length; i++) {
     const market = pair[i]
@@ -65,10 +69,12 @@ async function start () {
       calculateFee: exchange.calculateFee,
       stopped: false,
       ask: new BigNumber(0),
-      bid: new BigNumber(0)
+      bid: new BigNumber(0),
+      timestamp: 0
     })
 
     market.on('update', (ask, bid) => {
+      pair[i].timestamp = Math.floor(Date.now() / 1000)
       if (ask.c !== null) pair[i].ask = ask
       if (bid.c !== null) pair[i].bid = bid
     })
@@ -158,4 +164,4 @@ async function arbitrage () {
   await database.query(sql, values)
 }
 
-module.exports = { start, stop }
+module.exports = { start, stop, getPair }
