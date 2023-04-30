@@ -114,13 +114,14 @@ async function arbitrage () {
   if (isVerbose) console.log('Calculating balances and fees')
   const buyUsdBal = await buyEx.getBalance(buyEx.quote)
   const buyUsd = await buyEx.calculateFee(buyUsdBal)
+  const buyBtc = buyUsd.dividedBy(buyEx.bid)
   const sellBtcBal = await sellEx.getBalance(sellEx.base)
-  const sellUsdBal = sellBtcBal.multipliedBy(sellEx.ask)
+  const sellUsdBal = buyBtc.multipliedBy(sellEx.ask)
   const sellUsd = await sellEx.calculateFee(sellUsdBal)
-  const sellBtc = sellUsd.dividedBy(sellEx.ask)
   const difference = sellUsd.minus(buyUsd)
 
   if (
+    sellBtcBal.isLessThan(buyBtc) ||
     buyUsd.isLessThanOrEqualTo(2.5) ||
     sellUsd.isLessThanOrEqualTo(2.5) ||
     difference.isLessThan(ARBITRAGE_MIN_DIFF)
@@ -137,7 +138,7 @@ async function arbitrage () {
   const sellMaxNotation = sellEx.getMaxNotation(sellEx.symbol)
   const sellMaxNotationBtc = sellMaxNotation.dividedBy(sellEx.ask).decimalPlaces(8, BigNumber.ROUND_FLOOR)
   console.log('Executing sell from %s', sellEx.name)
-  promises.push(sellEx.sell(sellEx.symbol, sellEx.ask, sellBtc, sellMaxNotationBtc, 2))
+  promises.push(sellEx.sell(sellEx.symbol, sellEx.ask, buyBtc, sellMaxNotationBtc, 2))
 
   if (isVerbose) console.log('Waiting for transactions...')
   await Promise.all(promises)
@@ -157,7 +158,7 @@ async function arbitrage () {
 
   if (isVerbose) console.log('Saving to database...')
   const sql = 'INSERT INTO trades (buy_usd, sell_btc, profit, exchanges) VALUES (?, ?, ?, ?)'
-  const values = [buyUsd.toNumber(), sellBtc.toNumber(), difference.toNumber(), data]
+  const values = [buyUsd.toNumber(), buyBtc.toNumber(), difference.toNumber(), data]
   await database.query(sql, values)
 }
 
