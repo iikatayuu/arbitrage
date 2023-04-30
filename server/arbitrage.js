@@ -78,7 +78,7 @@ async function start () {
       if (ask.c !== null) pair[i].ask = ask
       if (bid.c !== null) pair[i].bid = bid
     })
-  
+
     market.on('stop', () => {
       pair[i].stopped = true
     })

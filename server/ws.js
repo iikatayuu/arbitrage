@@ -1,10 +1,9 @@
 
-const url = require('url')
 const jwt = require('jsonwebtoken')
 const markets = require('./ws/markets')
 
 function handleWS (request, socket, head) {
-  const { pathname, search } = url.parse(request.url)
+  const [pathname, search] = request.url.split('?')
   const searchParams = new URLSearchParams(search)
 
   if (pathname === `/ws/${markets.name}`) {
@@ -18,7 +17,7 @@ function handleWS (request, socket, head) {
         socket.destroy()
         return
       }
-  
+
       jwt.verify(token, jwtSecret, {
         issuer: jwtIssuer,
         subject: 'Login Token'

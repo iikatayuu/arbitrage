@@ -37,8 +37,8 @@ class CoinbaseMarket extends EventEmitter {
         const res = await axios.get(url, {
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
+            Pragma: 'no-cache',
+            Expires: '0'
           }
         })
         const data = res.data

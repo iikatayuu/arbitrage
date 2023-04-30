@@ -2,7 +2,6 @@
 const axios = require('axios')
 const BigNumber = require('bignumber.js')
 const { createSignature } = require('./utils/sign')
-const wait = require('../../utils/wait')
 
 const isProd = process.env.NODE_ENV === 'production'
 const COINBASE_BASE = isProd ? 'https://api.exchange.coinbase.com' : 'https://api-public.sandbox.exchange.coinbase.com'
@@ -10,10 +9,9 @@ const COINBASE_BASE = isProd ? 'https://api.exchange.coinbase.com' : 'https://ap
 const TICKER_INTERVAL = parseFloat(process.env.TICKER_INTERVAL)
 
 async function waitOrder (id) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     console.log('Waiting for Coinbase order: %s', id)
-    while (true) {
-      await wait(TICKER_INTERVAL * 1000)
+    const loop = setInterval(async () => {
       const requestPath = `/orders/${id}?market_type=spot`
       const headers = createSignature('GET', requestPath)
       const res = await axios.get(`${COINBASE_BASE}${requestPath}`, {
@@ -23,12 +21,13 @@ async function waitOrder (id) {
       const data = res.data
       if (data.settled && data.status === 'done') {
         resolve()
-        break
+        clearInterval(loop)
       } else if (data.status === 'rejected') {
-        reject()
-        break
+        const error = new Error('Order was rejected')
+        reject(error)
+        clearInterval(loop)
       }
-    }
+    }, TICKER_INTERVAL * 1000)
   })
 }
 

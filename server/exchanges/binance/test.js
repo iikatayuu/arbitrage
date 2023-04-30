@@ -13,7 +13,7 @@ if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true })
 const BigNumber = require('bignumber.js')
 const binance = require('./')
 
-let market = {
+const market = {
   ask: new BigNumber(0),
   bid: new BigNumber(0)
 }

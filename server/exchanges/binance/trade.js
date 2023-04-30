@@ -1,30 +1,29 @@
 
 const BigNumber = require('bignumber.js')
 const client = require('./utils/spot')
-const wait = require('../../utils/wait')
 
 const TICKER_INTERVAL = parseFloat(process.env.TICKER_INTERVAL)
 
 async function waitOrder (symbol, orderId) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     console.log('Waiting for Binance order: %s', orderId)
-    while (true) {
-      await wait(TICKER_INTERVAL * 1000)
+    const loop = setInterval(async () => {
       const orderRes = await client.getOrder(symbol, { orderId })
       const order = orderRes.data
       if (order.status === 'FILLED') {
         resolve()
-        break
+        clearInterval(loop)
       } else if (
         order.status === 'CANCELED' ||
         order.status === 'REJECTED' ||
         order.status === 'EXPIRED' ||
         order.status === 'EXPIRED_IN_MATCH'
       ) {
-        reject()
-        break
+        const error = new Error('Order was canceled, rejected, or expired')
+        reject(error)
+        clearInterval(loop)
       }
-    }
+    }, TICKER_INTERVAL * 1000)
   })
 }
 
