@@ -116,12 +116,13 @@ async function arbitrage () {
   const buyUsd = await buyEx.calculateFee(buyUsdBal)
   const buyBtc = buyUsd.dividedBy(buyEx.bid)
   const sellBtcBal = await sellEx.getBalance(sellEx.base)
+  const sellBtc = await sellEx.calculateFee(sellBtcBal)
   const sellUsdBal = buyBtc.multipliedBy(sellEx.ask)
   const sellUsd = await sellEx.calculateFee(sellUsdBal)
   const difference = sellUsd.minus(buyUsd)
 
   if (
-    sellBtcBal.isLessThan(buyBtc) ||
+    sellBtc.isLessThan(buyBtc) ||
     buyUsd.isLessThanOrEqualTo(2.5) ||
     sellUsd.isLessThanOrEqualTo(2.5) ||
     difference.isLessThan(ARBITRAGE_MIN_DIFF)
