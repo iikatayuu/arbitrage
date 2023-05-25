@@ -13,3 +13,4 @@ if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true })
 const client = require('./utils/spot')
 
 client.cancelOpenOrders('BTCUSDT').then(console.log).catch(console.error)
+client.cancelOpenOrders('ETHUSDT').then(console.log).catch(console.error)

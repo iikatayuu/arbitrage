@@ -30,10 +30,15 @@ router.get('/trades', asyncWrap(async (req, res) => {
 
   const results = await database.query('SELECT * FROM trades ORDER BY id DESC')
   const trades = results.map(result => ({
-    buyUsd: result.buy_usd,
-    sellBtc: result.sell_btc,
+    buyEx: result.buy_ex,
+    sellEx: result.sell_ex,
+    buySymbol: result.buy_symbol,
+    sellSymbol: result.sell_symbol,
+    buyBid: result.buy_bid,
+    sellAsk: result.sell_ask,
+    buyQuote: result.buy_quote,
+    sellBase: result.sell_base,
     profit: result.profit,
-    exchanges: JSON.parse(result.exchanges),
     date: result.added
   }))
 

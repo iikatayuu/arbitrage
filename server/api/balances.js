@@ -31,8 +31,10 @@ router.get('/balances', asyncWrap(async (req, res) => {
 
   const coinbaseUsd = await coinbase.getBalance('USD')
   const coinbaseBtc = await coinbase.getBalance('BTC')
+  const coinbaseEth = await coinbase.getBalance('ETH')
   const binanceUsdt = await binance.getBalance('USDT')
   const binanceBtc = await binance.getBalance('BTC')
+  const binanceEth = await binance.getBalance('ETH')
 
   res.json({
     success: true,
@@ -40,11 +42,13 @@ router.get('/balances', asyncWrap(async (req, res) => {
     balances: [
       {
         usd: coinbaseUsd.toNumber(),
-        btc: coinbaseBtc.toNumber()
+        btc: coinbaseBtc.toNumber(),
+        eth: coinbaseEth.toNumber()
       },
       {
         usdt: binanceUsdt.toNumber(),
-        btc: binanceBtc.toNumber()
+        btc: binanceBtc.toNumber(),
+        eth: binanceEth.toNumber()
       }
     ]
   })

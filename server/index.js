@@ -14,7 +14,7 @@ dotenv.config({ path: defaultConfigPath })
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true })
 
 const arbitrage = require('./arbitrage')
-require('./database')
+const database = require('./database')
 
 const api = require('./api')
 const ws = require('./ws')
@@ -47,4 +47,7 @@ const server = app.listen(port, () => {
 
 server.on('upgrade', ws)
 
-arbitrage.start()
+database.query('SELECT * FROM config WHERE name=\'symbol\'').then((results) => {
+  const index = results.length > 0 ? parseInt(results[0].value) : 0
+  arbitrage.start(index)
+})

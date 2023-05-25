@@ -32,20 +32,52 @@ function stop () {
   pair = []
 }
 
-async function start () {
+async function start (symbolIdx) {
   const promises = []
+  const coinbaseSymbols = [
+    {
+      symbol: 'BTC-USD',
+      base: 'BTC',
+      baseDecimals: 8,
+      quote: 'USD',
+      quoteDecimals: 2
+    },
+    {
+      symbol: 'ETH-USD',
+      base: 'ETH',
+      baseDecimals: 8,
+      quote: 'USD',
+      quoteDecimals: 2
+    }
+  ]
+
+  const binanceSymbols = [
+    {
+      symbol: 'BTCUSDT',
+      base: 'BTC',
+      baseDecimals: 8,
+      quote: 'USDT',
+      quoteDecimals: 2
+    },
+    {
+      symbol: 'ETHUSDT',
+      base: 'ETH',
+      baseDecimals: 8,
+      quote: 'USDT',
+      quoteDecimals: 2
+    }
+  ]
+
+  const coinbaseSymbol = coinbaseSymbols[symbolIdx]
+  const binanceSymbol = binanceSymbols[symbolIdx]
   const markets = [
     {
       object: coinbase,
-      symbol: 'BTC-USD',
-      base: 'BTC',
-      quote: 'USD'
+      ...coinbaseSymbol
     },
     {
       object: binance,
-      symbol: 'BTCUSDT',
-      base: 'BTC',
-      quote: 'USDT'
+      ...binanceSymbol
     }
   ]
 
@@ -54,13 +86,17 @@ async function start () {
     const exchange = exchangeMarket.object
     const symbol = exchangeMarket.symbol
     const base = exchangeMarket.base
+    const baseDecimals = exchangeMarket.baseDecimals
     const quote = exchangeMarket.quote
+    const quoteDecimals = exchangeMarket.quoteDecimals
     const market = new exchange.Market(symbol, isVerbose)
     pair.push({
       name: exchange.name,
       symbol,
       quote,
+      quoteDecimals,
       base,
+      baseDecimals,
       market,
       buy: exchange.buy,
       sell: exchange.sell,
@@ -112,19 +148,19 @@ async function arbitrage () {
   }
 
   if (isVerbose) console.log('Calculating balances and fees')
-  const buyUsdBal = await buyEx.getBalance(buyEx.quote)
-  const buyUsd = await buyEx.calculateFee(buyUsdBal)
-  const buyBtc = buyUsd.dividedBy(buyEx.bid)
-  const sellBtcBal = await sellEx.getBalance(sellEx.base)
-  const sellBtc = await sellEx.calculateFee(sellBtcBal)
-  const sellUsdBal = buyBtc.multipliedBy(sellEx.ask)
-  const sellUsd = await sellEx.calculateFee(sellUsdBal)
-  const difference = sellUsd.minus(buyUsd)
+  const buyQuoteBal = await buyEx.getBalance(buyEx.quote)
+  const buyQuote = await buyEx.calculateFee(buyQuoteBal)
+  const buyBase = buyQuote.dividedBy(buyEx.bid)
+  const sellBaseBal = await sellEx.getBalance(sellEx.base)
+  const sellBase = await sellEx.calculateFee(sellBaseBal)
+  const sellQuoteBal = buyBase.multipliedBy(sellEx.ask)
+  const sellQuote = await sellEx.calculateFee(sellQuoteBal)
+  const difference = sellQuote.minus(buyQuote)
 
   if (
-    sellBtc.isLessThan(buyBtc) ||
-    buyUsd.isLessThanOrEqualTo(2.5) ||
-    sellUsd.isLessThanOrEqualTo(2.5) ||
+    sellBase.isLessThan(buyBase) ||
+    buyQuote.isLessThanOrEqualTo(2.5) ||
+    sellQuote.isLessThanOrEqualTo(2.5) ||
     difference.isLessThan(ARBITRAGE_MIN_DIFF)
   ) {
     console.log('No balance or not enough profit')
@@ -134,32 +170,30 @@ async function arbitrage () {
   const promises = []
   const buyMaxNotation = buyEx.getMaxNotation(buyEx.symbol)
   if (isVerbose) console.log('Executing buy from %s', buyEx.name)
-  promises.push(buyEx.buy(buyEx.symbol, buyEx.bid, buyUsd, buyMaxNotation, 8))
+  promises.push(buyEx.buy(buyEx.symbol, buyEx.bid, buyQuote, buyMaxNotation, buyEx.baseDecimals))
 
   const sellMaxNotation = sellEx.getMaxNotation(sellEx.symbol)
-  const sellMaxNotationBtc = sellMaxNotation.dividedBy(sellEx.ask).decimalPlaces(8, BigNumber.ROUND_FLOOR)
+  const sellMaxNotationBase = sellMaxNotation.dividedBy(sellEx.ask).decimalPlaces(sellEx.baseDecimals, BigNumber.ROUND_FLOOR)
   console.log('Executing sell from %s', sellEx.name)
-  promises.push(sellEx.sell(sellEx.symbol, sellEx.ask, buyBtc, sellMaxNotationBtc, 2))
+  promises.push(sellEx.sell(sellEx.symbol, sellEx.ask, buyBase, sellMaxNotationBase, sellEx.quoteDecimals))
 
   if (isVerbose) console.log('Waiting for transactions...')
   await Promise.all(promises)
 
-  const data = JSON.stringify({
-    buy: {
-      name: buyEx.name,
-      ask: buyEx.ask.toNumber(),
-      bid: buyEx.bid.toNumber()
-    },
-    sell: {
-      name: sellEx.name,
-      ask: sellEx.ask.toNumber(),
-      bid: sellEx.bid.toNumber()
-    }
-  })
-
   if (isVerbose) console.log('Saving to database...')
-  const sql = 'INSERT INTO trades (buy_usd, sell_btc, profit, exchanges) VALUES (?, ?, ?, ?)'
-  const values = [buyUsd.toNumber(), buyBtc.toNumber(), difference.toNumber(), data]
+  const sql = 'INSERT INTO trades (buy_ex, sell_ex, buy_symbol, sell_symbol, buy_bid, sell_ask, buy_quote, sell_base, profit) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  const values = [
+    buyEx.name,
+    sellEx.name,
+    buyEx.symbol,
+    sellEx.symbol,
+    buyEx.bid.toNumber(),
+    sellEx.ask.toNumber(),
+    buyQuote.toNumber(),
+    buyBase.toNumber(),
+    difference.toNumber()
+  ]
+
   await database.query(sql, values)
 }
 
