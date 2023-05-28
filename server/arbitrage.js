@@ -25,7 +25,7 @@ function getPair () {
 
 function stop () {
   for (let i = 0; i < pair.length; i++) {
-    const market = pair[i]
+    const market = pair[i].market
     market.stop()
   }
 
