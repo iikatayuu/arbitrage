@@ -10,12 +10,19 @@ export interface MarketData extends Market {
 }
 
 export interface Trade {
-  buyUsd: number;
-  sellBtc: number;
+  buyEx: string;
+  sellEx: string;
+  buySymbol: string;
+  sellSymbol: string;
+  buyBid: number;
+  sellAsk: number;
+  buyQuote: number;
+  sellBase: number;
   profit: number;
-  exchanges: {
-    buy: Market,
-    sell: Market
-  };
   date: string;
+}
+
+export interface Symbol {
+  base: string;
+  quote: string;
 }

@@ -20,6 +20,10 @@
   text-align: center;
 }
 
+.dashboard-actions select {
+  margin-right: 16px;
+}
+
 @media (min-width: 0) and (max-width: 992px) {
   .dashboard-prices {
     flex-direction: column;

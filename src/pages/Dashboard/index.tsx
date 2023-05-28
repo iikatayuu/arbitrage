@@ -14,7 +14,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 
-import { MarketData, Trade } from '../../types';
+import { MarketData, Trade, Symbol } from '../../types';
 import { getTime } from '../../utils/date';
 import './style.scss';
 
@@ -37,10 +37,14 @@ interface DashboardProps extends DashboardWrapProps {
 interface DashboardState {
   markets: MarketData[][];
   trades: Trade[];
+  symbol: Symbol | null;
+  symbolIdx: string;
   coinbaseUsd: number;
   coinbaseBtc: number;
+  coinbaseEth: number;
   binanceUsdt: number;
   binanceBtc: number;
+  binanceEth: number;
 }
 
 class Dashboard extends React.Component<DashboardProps, DashboardState> {
@@ -50,13 +54,19 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.state = {
       markets: [],
       trades: [],
+      symbol: null,
+      symbolIdx: '0',
       coinbaseUsd: 0,
       coinbaseBtc: 0,
+      coinbaseEth: 0,
       binanceUsdt: 0,
-      binanceBtc: 0
+      binanceBtc: 0,
+      binanceEth: 0
     };
 
     this.logout = this.logout.bind(this);
+    this.changeSymbol = this.changeSymbol.bind(this);
+    this.loadSymbol = this.loadSymbol.bind(this);
     this.loadBalances = this.loadBalances.bind(this);
     this.loadTrades = this.loadTrades.bind(this);
   }
@@ -64,6 +74,49 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
   logout (event: React.MouseEvent) {
     sessionStorage.removeItem('token');
     this.props.navigate('/');
+  }
+
+  async changeSymbol (event: React.ChangeEvent) {
+    const backend = process.env.REACT_APP_BACKEND_API;
+    const token = sessionStorage.getItem('token');
+    if (typeof backend === 'undefined' || token === null) return;
+
+    const target = event.target as HTMLSelectElement;
+    const value = target.value;
+
+    try {
+      const data = { index: value };
+      const symbolRes = await axios.post(`${backend}/api/symbol`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (symbolRes.data.success) await this.loadSymbol();
+    } catch (error) {
+      window.alert('Unable to fetch symbol');
+    }
+  }
+
+  async loadSymbol () {
+    const backend = process.env.REACT_APP_BACKEND_API;
+    const token = sessionStorage.getItem('token');
+    if (typeof backend === 'undefined' || token === null) return;
+
+    try {
+      const symbolRes = await axios.get(`${backend}/api/symbol`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      if (symbolRes.data.success) {
+        const symbol = symbolRes.data.symbol as Symbol;
+        let symbolIdx: string = '';
+        if (symbol.base === 'BTC') symbolIdx = '0';
+        else if (symbol.base === 'ETH') symbolIdx = '1';
+
+        this.setState({ symbol, symbolIdx });
+      }
+    } catch (error) {
+      window.alert('Unable to fetch symbol');
+    }
   }
 
   async loadBalances () {
@@ -81,8 +134,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         this.setState({
           coinbaseUsd: balances[0].usd,
           coinbaseBtc: balances[0].btc,
+          coinbaseEth: balances[0].eth,
           binanceUsdt: balances[1].usdt,
-          binanceBtc: balances[1].btc
+          binanceBtc: balances[1].btc,
+          binanceEth: balances[1].eth
         });
       }
     } catch (error) {
@@ -125,6 +180,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       this.setState({ markets });
     })
 
+    await this.loadSymbol();
     await this.loadBalances();
     await this.loadTrades();
   }
@@ -134,6 +190,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     if (token === null) return <Navigate to="/" />;
 
     const markets = this.state.markets;
+    const symbol = this.state.symbol;
     const coinbaseOptions = {
       responsive: true,
       plugins: {
@@ -142,7 +199,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         },
         title: {
           display: true,
-          text: 'Coinbase BTC-USD'
+          text: `Coinbase ${symbol?.base}/${symbol?.quote}`
         }
       }
     };
@@ -173,7 +230,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
         },
         title: {
           display: true,
-          text: 'Binance BTC-USDT'
+          text: `Binance ${symbol?.base}/${symbol?.quote}`
         }
       }
     };
@@ -200,7 +257,15 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
       <React.Fragment>
         <header className="dashboard-header py-3 px-4">
           <h1>Arbitrage</h1>
-          <button type="button" className="btn btn-primary" onClick={this.logout}>Log Out</button>
+          
+          <div className="dashboard-actions">
+            <select name="symbol" className="form-control" value={this.state.symbolIdx} defaultValue={this.state.symbolIdx} onChange={this.changeSymbol}>
+              <option value="0">BTC/USD</option>
+              <option value="1">ETH/USD</option>
+            </select>
+
+            <button type="button" className="btn btn-primary" onClick={this.logout}>Log Out</button>
+          </div>
         </header>
 
         <main>
@@ -211,6 +276,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               <h3>Coinbase</h3>
               <div>USD Balance: { this.state.coinbaseUsd } $</div>
               <div>BTC Balance: { this.state.coinbaseBtc } BTC</div>
+              <div>ETH Balance: { this.state.coinbaseEth } ETH</div>
             </div>
 
             <div className="dashboard-price p-4">
@@ -219,6 +285,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
               <h3>Binance</h3>
               <div>USDT Balance: { this.state.binanceUsdt } $</div>
               <div>BTC Balance: { this.state.binanceBtc } BTC</div>
+              <div>ETH Balance: { this.state.binanceEth } ETH</div>
             </div>
           </div>
 
@@ -239,11 +306,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                 { this.state.trades.map((trade, i) => {
                   return (
                     <tr key={i}>
-                      <td>{ trade.buyUsd }</td>
-                      <td>{ trade.sellBtc }</td>
+                      <td>{ trade.buyQuote }</td>
+                      <td>{ trade.sellBase }</td>
                       <td>{ trade.profit }</td>
-                      <td>{ trade.exchanges.buy.name }</td>
-                      <td>{ trade.exchanges.sell.name }</td>
+                      <td>{ trade.buyEx }</td>
+                      <td>{ trade.sellEx }</td>
                       <td>{ trade.date }</td>
                     </tr>
                   );

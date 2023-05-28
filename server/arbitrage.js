@@ -63,7 +63,7 @@ async function start (symbolIdx) {
       symbol: 'ETHUSDT',
       base: 'ETH',
       baseDecimals: 8,
-      quote: 'USDT',
+      quote: 'USD',
       quoteDecimals: 2
     }
   ]
