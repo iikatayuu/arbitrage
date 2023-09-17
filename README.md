@@ -1,46 +1,43 @@
-# Getting Started with Create React App
+# Crypto Arbitrage
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![GitHub](https://img.shields.io/github/license/eidoriantan/arbitrage)](https://github.com/eidoriantan/arbitrage/blob/master/LICENSE.txt)
 
-## Available Scripts
+Automate trading opportunities between crypto exchanges. Currently supports
+[Binance](https://www.binance.com/en) and [Coinbase](https://www.coinbase.com/home).
 
-In the project directory, you can run:
+### Prerequisites
+ * [Node.js](https://nodejs.org)
+ * MySQL Server
+ * [Binance](https://www.binance.com/en) API key, secret, and passphrase
+ * [Coinbase](https://www.coinbase.com/home) API key and secret
 
-### `npm start`
+### Setting up the app
+This system uses MySQL server to store the transactions history. You can just simply
+run the SQL file at `setup/database.sql` in your server to set it up.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+After setting up the MySQL server, you'll need to add your `.env` file. You can rename
+the `.env` file to `.env.development` for development environments or `.env.local` for
+production environments then update the file to your configuration.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Running the app
+In order to run this app, you'll need [Nodejs](https://nodejs.org) and `npm` installed
+already in your system.
 
-### `npm test`
+Install the dependencies then build the app by running:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```shell
+npm install
+npm run build
+```
 
-### `npm run build`
+After installing the dependencies and building the app, you can now run it by:
+```shell
+npm run server
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Support
+If you had found a bug or any unexpected behavior, you can submit an issue
+through GitHub
+[issues](https://github.com/eidoriantan/arbitrage/issues). If you wanted to
+contribute to this repository and become a contributor, you are very welcome to
+do so.
